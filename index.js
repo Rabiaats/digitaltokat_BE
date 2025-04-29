@@ -13,6 +13,8 @@ const HOST = process.env?.HOST || '127.0.0.1';
 require('express-async-errors');
 
 // connect to db
+const { dbConnection } = require('./src/configs/dbConnection')
+dbConnection();
 
 // json veriler ve form
 app.use(express.json());
