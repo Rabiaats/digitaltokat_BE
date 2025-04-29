@@ -38,7 +38,7 @@ app.all('/', (req, res) => {
 });
 
 // routes -> genel bir index.js route u
-
+app.use(require('./src/routes'))
 
 // notfound
 app.all('*', (req, res) => {
