@@ -1,7 +1,4 @@
 "use strict"
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
 // sync():
 
 module.exports = async function () {
@@ -14,7 +11,7 @@ module.exports = async function () {
     console.log('- Database and all data DELETED!')
     /* REMOVE DATABASE */
 
-    /* User */
+    /* User *
     const User = require('../models/user')
     await User.deleteMany() // !!! Clear collection.
     await User.create({

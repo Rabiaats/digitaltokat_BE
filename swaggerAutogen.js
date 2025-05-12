@@ -40,12 +40,12 @@ const document = {
 	security: [{ Token: [] }, { Bearer: [] }],
 	definitions: {
 		// Models:
-		// "User": require('./src/models/user').schema.obj,
-		// "Firm": require('./src/models/firm').schema.obj,
-		// "Product": require('./src/models/product').schema.obj,
-		// "Type": require('./src/models/type').schema.obj,
-		// "Category": require('./src/models/category').schema.obj,
-		// "Token": require('./src/models/token').schema.obj,
+		"User": require('./src/models/user').schema.obj,
+		"Firm": require('./src/models/firm').schema.obj,
+		"Product": require('./src/models/product').schema.obj,
+		"Type": require('./src/models/type').schema.obj,
+		"Category": require('./src/models/category').schema.obj,
+		"Token": require('./src/models/token').schema.obj,
 	}
 }
 

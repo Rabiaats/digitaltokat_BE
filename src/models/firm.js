@@ -27,7 +27,9 @@ const FirmSchema = new mongoose.Schema({
     domain: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true,
+        index: true
     },
 
     description: {
@@ -81,6 +83,13 @@ const FirmSchema = new mongoose.Schema({
         type: []
     },
 
+    countOfVisitors:{
+        type: Number,
+        get: function (){
+            return this.visitors.length;
+        }
+    },
+
     rating: {
         type: Number,
         default: 0,
@@ -88,8 +97,27 @@ const FirmSchema = new mongoose.Schema({
 
 }, {
     collection: 'firms',
-    timestamps: true
-})
+    timestamps: true,
+    toJSON: {getters: true}
+});
 
+FirmSchema.pre('save', function (next) {
+    if (!this.domain || this.domain.trim() === '') {
+      this.domain = `/details/${this._id}`;
+    }
+    next();
+});
 
-module.exports = mongoose.model('Firm', FİrmSchema)
+// // domain yoksa yönlendir
+// if (firm.domain == `/details/${firm._id}`) {
+//     return res.redirect(`https://www.tokatdigital.com${domain}`);
+//   }else { return res.redirect(domain)}
+
+//   // domain varsa normal şekilde gönder
+//   res.status(200).send({
+//     error: false,
+//     data: firm
+//   });
+  
+
+module.exports = mongoose.model('Firm', FirmSchema)
