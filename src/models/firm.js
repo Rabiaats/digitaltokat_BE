@@ -9,14 +9,6 @@ const FirmSchema = new mongoose.Schema({
         ref: 'Type',
         required: true
     },
-    
-    categoryId: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Category',
-            required: true
-        }
-    ],
 
     name: {
         type: String,
@@ -26,9 +18,8 @@ const FirmSchema = new mongoose.Schema({
 
     domain: {
         type: String,
-        required: true,
+        default: null,
         trim: true,
-        unique: true,
         index: true
     },
 
@@ -62,7 +53,7 @@ const FirmSchema = new mongoose.Schema({
         trim: true
     },
 
-    images: {
+    image: {
         type: [String],
         required: [true, "Görsel alanı zorunludur."],
         validate: {
@@ -71,12 +62,6 @@ const FirmSchema = new mongoose.Schema({
             },
             message: "En az bir görsel yüklenmelidir.",
         },
-    },
-    
-    color: {
-        type: String,
-        required: true,
-        trim: true
     },
     
     visitors: {
@@ -92,7 +77,12 @@ const FirmSchema = new mongoose.Schema({
 
     rating: {
         type: Number,
-        default: 0,
+        default: 0
+    },
+
+    isActive: {
+        type: Boolean,
+        default: true
     }
 
 }, {
@@ -100,24 +90,5 @@ const FirmSchema = new mongoose.Schema({
     timestamps: true,
     toJSON: {getters: true}
 });
-
-FirmSchema.pre('save', function (next) {
-    if (!this.domain || this.domain.trim() === '') {
-      this.domain = `/details/${this._id}`;
-    }
-    next();
-});
-
-// // domain yoksa yönlendir
-// if (firm.domain == `/details/${firm._id}`) {
-//     return res.redirect(`https://www.tokatdigital.com${domain}`);
-//   }else { return res.redirect(domain)}
-
-//   // domain varsa normal şekilde gönder
-//   res.status(200).send({
-//     error: false,
-//     data: firm
-//   });
-  
 
 module.exports = mongoose.model('Firm', FirmSchema)
