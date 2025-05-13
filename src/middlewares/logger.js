@@ -1,9 +1,4 @@
 "use strict";
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
-// $ npm i morgan
-// app.use(logger):
 
 const morgan = require("morgan");
 const fs = require("node:fs");

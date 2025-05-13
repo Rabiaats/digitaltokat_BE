@@ -1,15 +1,11 @@
 "use strict"
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
-// Middleware: permissions
 
 module.exports = {
 
     isLogin: (req, res, next) => {
 
         // Set Passive:
-        return next()
+        // return next()
 
         // any User:
         if (req.user) {
@@ -26,7 +22,7 @@ module.exports = {
     isSuperAdmin: (req, res, next) => {
 
         // Set Passive:
-        return next()
+        // return next()
         
         // only Admin:
         if (req.user && req.user.role == 'superadmin') {
@@ -42,7 +38,7 @@ module.exports = {
 
     isFirmOrSuperAdmin: (req, res, next) => {
 
-        return next()
+        // return next()
 
 
         if(req.user && (req.user.role == 'firm' || req.user.role == 'superadmin')){

@@ -1,8 +1,4 @@
 "use strict"
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
-// passwordEncrypt(password:string):
 
 const { pbkdf2Sync } = require('node:crypto'),
     keyCode = process.env.SECRET_KEY,

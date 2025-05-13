@@ -1,10 +1,7 @@
 "use strict"
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
-// app.use(upload.array('fieldName'))
 
 const multer = require('multer')
+const path = require("node:path");
 
 module.exports = multer({
     storage: multer.diskStorage({

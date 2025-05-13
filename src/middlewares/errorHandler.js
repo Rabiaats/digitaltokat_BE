@@ -1,8 +1,4 @@
 "use strict"
-/* -------------------------------------------------------
-    | FULLSTACK TEAM | NODEJS / EXPRESS |
-------------------------------------------------------- */
-// app.use(errorHandler):
 
 module.exports = (err, req, res, next) => {
 
