@@ -28,13 +28,16 @@ const ProductSchema = new mongoose.Schema({
         trim: true
     },
 
-    images:[
-        {
-            type:String,
-            required: true,
-            trim: true
-        }
-    ],
+    image:{
+        type:String,
+        required: [true, "Görsel alanı zorunludur."],
+        validate: {
+            validator: function (value) {
+                return value.length > 0;
+            },
+            message: "Bir görsel yüklenmelidir.",
+        },
+    },
     
     price: {
         type: Number,
