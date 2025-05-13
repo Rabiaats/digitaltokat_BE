@@ -61,21 +61,8 @@ module.exports = {
             `
             )
 
-        /* Auth Login */
-        // Simple Token:
-        const tokendata = await token.create({
-            userId: data._id,
-            token: passwordEncrypt(data._id + Date.now())
-        })
-
-        // JWT:
-        const accessToken = jwt.sign(data.toJSON(), process.env.ACCESS_KEY, { expiresIn: process.env.ACCESS_EXP })
-        const refreshToken = jwt.sign({ _id: data._id, password: data.password }, process.env.REFRESH_KEY, { expiresIn: process.env.REFRESH_EXP })
-
         res.status(201).send({
             error: false,
-            token: tokendata.token,
-            bearer: { accessToken, refreshToken },
             data
         })
     },
@@ -134,7 +121,7 @@ module.exports = {
 
         res.status(data.deletedCount ? 204 : 404).send({
             error: true,
-            message: 'Something went wrong, data might be deleted already.'
+            message: 'Kullanıcı önceden silinmiş olabilir.'
         })
     },
 
@@ -170,29 +157,29 @@ module.exports = {
                 
                 res.status(404).send({
                     error: true,
-                    message: 'User not exist with this email!'
+                    message: 'Bu email de bir kullanıcı yok!'
                 })
             }
 
             await sendMail(
                 email,
-                'Reset Your Password',
+                'Şifre Sıfırlama',
                 `
                     <div style="font-family: Arial, sans-serif; padding: 20px;">
-                    <h2 style="color: #333;">Hello,</h2>
-                    <p>You requested to reset your password. Please use the code below:</p>
+                    <h2 style="color: #333;">Merhaba,</h2>
+                    <p>Şifrenizi sıfırlamak istediniz. Lütfen aşağıdaki kodu kullanın:</p>
                     <div style="font-size: 24px; font-weight: bold; background-color: #f0f0f0; padding: 10px; width: fit-content;">
                         ${verifyCode}
                     </div>
-                    <p>This code will expire in 10 minutes.</p>
-                    <p>If you didn't request this, please ignore this email.</p>
+                    <p>Bu kodun süresi 10 dakika içinde sona erecek.</p>
+                    <p>Bunu isteği göndermediysen, lütfen bu e-postayı dikkate almayın.</p>
                     </div>
                 `
                 )
 
             res.status(200).send({
-                success: true,
-                message: 'Reset code sent!'
+                error: false,
+                message: 'Şifre sıfırlama kodu gönderildi'
               });
     },
 
@@ -222,20 +209,20 @@ module.exports = {
         if(user.matchedCount == 0){
             res.status(404).send({
                 error: true,
-                message: 'User not exist with this email!'
+                message: 'BU email de bir kulanıcı yok!'
             })
         }
 
         if (data.modifiedCount === 0) {
             return res.status(202).send({ 
                 error: false, 
-                message: 'No changes made. Same password maybe?' 
+                message: 'Değişiklik yapılmadı. Şifreniz önceki şifrenizle aynı olabilir.' 
             });
         }
 
         res.status(202).send({ 
             error:false, 
-            message: 'Password updated successfully.' 
+            message: 'Şifreniz güncellendi.' 
         });
     }
 

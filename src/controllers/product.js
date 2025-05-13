@@ -72,13 +72,11 @@ module.exports = {
             })
         }
 
-        req.body.images = [];
+        req.body.image = "";
 
-        if(req.files){
-            for(let file of req.files){
-                req.body.images.push(file.path)
-                }
-            };
+        if(req.file){
+            req.body.image = req.file.path
+        };
 
         const data = await Product.create(req.body)
     
@@ -100,13 +98,9 @@ module.exports = {
             if(req.user && req.user.role == 'firm'){
                 customFilter = {firmId: req.user.firmId}
             }
-
-            const ip = encrypt(requestIP.getClientIp(req));
     
-            const data = await Product.findOneAndUpdate(
+            const data = await Product.findOne(
                 { _id: req.params.id, ...customFilter },
-                {$addToSet: {popularity: ip}},
-                {new: true}
             ).populate([
                 {path: 'categoryId', select: 'name -_id'},
                 {path: 'firmId', select: 'name -_id'},
@@ -132,28 +126,24 @@ module.exports = {
                 }
             */
 
-            if (req.files) {
-                for (let file of req.files) {
-                    req.body.image.push(file.path);
-                }
+        req.body.image = "";
+
+            if (req.file) {
+                req.body.image = req.file.path;
             }
 
             if(req.user && req.user.role == 'firm'){
                 customFilter = {firmId: req.user.firmId}
             }
             
-            const product = await Product.findOne({_id: req.params.id});
+            const product = await Product.findOne({_id: req.params.id, ...customFilter});
             
-            if(product){
-                const imagesToDelete = product.images.filter((deleteImagePath) => !req.body.image.includes(deleteImagePath));
-                            
-                imagesToDelete.forEach((imagePath) => {
-                    if (fs.existsSync(imagePath)) {
-                        fs.unlinkSync(imagePath);
-                    }
-                });
+            if(product && product.image){
+                if (fs.existsSync(`${deleteImage.image}`)) {
+                    fs.unlinkSync(`${deleteImage.image}`);
+                }
             }else{
-                throw new CustomError("This product could not be found")
+                throw new CustomError("Güncellemek istediğiniz ürün firmanızda bulunmamaktadır")
             }
 
             const data = await Product.updateOne({ _id: req.params.id, ...customFilter }, req.body, { runValidators: true })
@@ -182,15 +172,13 @@ module.exports = {
                 throw new CustomError('This product could not be found')
             }
 
-                const deleteImage = await Product.findOne({ _id: req.params.id });
+            const deleteImage = await Product.findOne({ _id: req.params.id });
              
-                if (deleteImage && deleteImage.images) {
-                    deleteImage.images.forEach((item) => {
-                    if (fs.existsSync(item)) {
-                      fs.unlinkSync(item);
-                    }
-                  });
+            if (deleteImage && deleteImage.image) {
+                if (fs.existsSync(`${deleteImage.image}`)) {
+                    fs.unlinkSync(`${deleteImage.image}`);
                 }
+            }
 
             await Product.deleteOne({_id : req.params.id})
     

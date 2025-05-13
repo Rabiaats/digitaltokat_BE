@@ -1,6 +1,7 @@
 "use strict"
 
 const Firm = require('../models/firm');
+const User = require('../models/user')
 const requestIP = require("request-ip");
 const fs = require('node:fs');
 const encrypt = require("../helpers/passwordEncrypt");
@@ -22,19 +23,18 @@ module.exports = {
             `
         */
 
-        let customFilter = {};
+        let customFilter = {isActive: true};
 
         if (req.user?.role == 'firm') customFilter = {_id: req.firm};
 
         const requestDomain = req.get('host');
 
-        if (requestDomain !== 'www.tokatdigital.com' || requestDomain !== 'localhost:8000') {
+        if (requestDomain !== 'www.tokatdigital.com' && requestDomain !== '127.0.0.1:8000') {
             customFilter.domain = requestDomain;
         }
 
         const data = await res.getModelList(Firm, customFilter, [
-            {path: 'typeId', select: 'name'},
-            {path: 'categoryId', select: 'name'}
+            { path: 'typeId', select: 'name' }
         ])
 
         res.status(200).send({
@@ -57,11 +57,11 @@ module.exports = {
                 }
             */
 
-                req.body.images = [];
+                req.body.image = [];
 
         if(req.files){
             for(let file of req.files){
-                req.body.images.push(file.path)
+                req.body.image.push(file.path)
                 }
             };
 
@@ -106,7 +106,8 @@ module.exports = {
     
             res.status(200).send({
                 error: false,
-                data
+                data,
+                domain: data.domain
             })
     
         },
@@ -124,7 +125,7 @@ module.exports = {
                 }
             */
 
-                if ((req.user.role == 'firm') && req.params.id != req.user.firmId){
+                if ((req.user?.role == 'firm') && req.params.id != req.user.firmId){
 
                 res.status(403).send({
                     error: true,
@@ -133,7 +134,7 @@ module.exports = {
 
             }
 
-            let firmId = req.user.role == 'firm' ? req.user.firmId : req.params.id
+            let firmId = req.user?.role == 'firm' ? req.user.firmId : req.params.id
 
             if (req.files) {
                 for (let file of req.files) {
@@ -143,8 +144,8 @@ module.exports = {
             
             const firm = await Firm.findOne({_id: firmId});
             
-            if(firm){
-                const imagesToDelete = firm.images.filter((deleteImagePath) => !req.body.image.includes(deleteImagePath));
+            if(firm && req.files){
+                const imagesToDelete = firm.image.filter((deleteImagePath) => !req.body.image.includes(deleteImagePath));
                             
                 imagesToDelete.forEach((imagePath) => {
                     if (fs.existsSync(imagePath)) {
@@ -180,13 +181,13 @@ module.exports = {
 
             const deleteImage = await Firm.findOne({ _id: req.params.id });
  
-    if (deleteImage && deleteImage.images) {
-        deleteImage.images.forEach((item) => {
-        if (fs.existsSync(item)) {
-          fs.unlinkSync(item);
-        }
-      });
-    }
+            if (deleteImage && deleteImage.image) {
+                deleteImage.image.forEach((item) => {
+                if (fs.existsSync(item)) {
+                fs.unlinkSync(item);
+                }
+            });
+            }
     
             const data = await Firm.deleteOne({ _id: req.params.id})
     
