@@ -22,12 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // cors -> su anlik hepsine izin ver
-app.use(
-    cors({
-      origin: [`http://${HOST}:${PORT}`, `http://${HOST}:${PORT}`],
-      methods: ["GET", "POST", "PUT", "DELETE"],
-    })
-  );
+app.use(cors());
 
 // upload - middleware eklenecek (authentication - logger - queryHandler) -> errorHandler app.listen in ustune eklenecek
 
