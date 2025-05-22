@@ -24,6 +24,8 @@ module.exports = {
             `
         */
 
+        let customFilter = "";
+
         if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
 
         const requestDomain = req.get('host');
@@ -73,7 +75,8 @@ module.exports = {
     
             res.status(201).send({
                 error: false,
-                data
+                data,
+                password
             })
         },
     
