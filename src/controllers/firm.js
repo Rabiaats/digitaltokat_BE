@@ -30,8 +30,9 @@ module.exports = {
 
         const requestDomain = req.get('host');
 
-        console.log(requestDomain);
-        if (requestDomain !== 'www.tokatdigital.com' && !requestDomain.includes('127.0.0.1')) {
+        console.log("requestdomain = ", requestDomain);
+
+        if (requestDomain !== 'www.tokatdigital.com' && !requestDomain.includes('digitaltokat-be.onrender.com')) {
             customFilter.domain = requestDomain;
         }
 
@@ -42,7 +43,8 @@ module.exports = {
         res.status(200).send({
             error: false,
             details: await res.getModelListDetails(Firm),
-            data            
+            data,
+            requestDomain
         })
     },
 
