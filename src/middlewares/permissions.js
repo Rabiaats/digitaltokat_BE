@@ -5,7 +5,7 @@ module.exports = {
     isLogin: (req, res, next) => {
 
         // Set Passive:
-        return next()
+        // return next()
 
         // any User:
         if (req.user) {
@@ -22,7 +22,7 @@ module.exports = {
     isAdmin: (req, res, next) => {
 
         // Set Passive:
-        return next()
+        // return next()
         
         // only Admin:
         if (req.user && req.user.isAdmin) {
@@ -38,7 +38,7 @@ module.exports = {
 
     isStaffOrAdmin: (req, res, next) => {
 
-        return next()
+        // return next()
 
         if(req.user && (req.user.isAdmin || req.user.isStaff)){
             next();
@@ -50,7 +50,7 @@ module.exports = {
 
      isStaff: (req, res, next) => {
 
-        return next()
+        // return next()
         
         if (req.user?.isStaff) {
 
