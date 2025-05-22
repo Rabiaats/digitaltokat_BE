@@ -1,7 +1,7 @@
 "use strict"
 
 
-const Type = require('../models/Type');
+const Type = require('../models/type');
 
 module.exports = {
 
