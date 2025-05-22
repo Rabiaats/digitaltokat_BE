@@ -5,13 +5,13 @@ const router = require('express').Router()
 
 const {list, create, read, update, deletee} = require('../controllers/user');
 
-const {isSuperAdmin, isFirmOrSuperAdmin} = require('../middlewares/permissions');
+const {isAdmin, isStaffOrAdmin} = require('../middlewares/permissions');
 
 router.route('/')
-    .get(isSuperAdmin, list)
-    .post(isSuperAdmin, create)
+    .get(isAdmin, list)
+    .post(create)
 
-router.use(isFirmOrSuperAdmin)
+router.use(isStaffOrAdmin)
 router.route('/:id')
     .get(read)
     .put(update)

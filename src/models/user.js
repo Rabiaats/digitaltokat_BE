@@ -8,7 +8,14 @@ const UserSchema = new mongoose.Schema({
     firmId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Firm',
-        required: true
+        validate: {
+            validator: function (value) {
+                // isStaff true ise firmId gerekli
+                if (this.isStaff && !value) return false;
+                return true;
+            },
+            message: 'Satıcının ait olduğu firmanın bilgisi için firma id si girilmesi zorunludur. '
+        }
     },
 
     email: {
@@ -25,10 +32,41 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
 
-    role: {
+    firstName: {
         type: String,
-        enum: ['firm', 'superadmin'],
-        required: true
+        trim: true,
+        validate: {
+            validator: function (value) {
+                if (this.isStaff || this.isAdmin) return true;
+                return !!value;
+            },
+        }
+    },
+
+    lastName: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function (value) {
+                if (this.isStaff || this.isAdmin) return true;
+                return !!value;
+            },
+        }
+    },
+
+    image: {
+        type: String,
+        trim: true,
+    },
+
+    isAdmin: {
+        type: Boolean,
+        default: false
+    },
+
+    isStaff:{
+        type: Boolean,
+        default: false
     },
 
     resetPassCode: String,

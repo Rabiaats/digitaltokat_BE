@@ -6,11 +6,11 @@ const router = require('express').Router()
 const {list, create, read, update, deletee} = require('../controllers/category');
 
 
-const {isSuperAdmin} = require('../middlewares/permissions');
+const {isAdmin} = require('../middlewares/permissions');
 
 router.get('/', list)
 
-router.use(isSuperAdmin)
+router.use(isAdmin)
 router.post('/', create)
 router.route('/:id')
     .get(read)

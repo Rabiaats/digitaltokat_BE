@@ -47,7 +47,7 @@ module.exports = {
 
         /* JWT */
         const accessToken = jwt.sign(user.toJSON(), process.env.ACCESS_KEY, { expiresIn: process.env.ACCESS_EXP })
-        const refreshToken = jwt.sign({ _id: user._id, password: user.password, firmId: user.firmId }, process.env.REFRESH_KEY, { expiresIn: process.env.REFRESH_EXP })
+        const refreshToken = jwt.sign({ _id: user._id, password: user.password, firmId: user.isStaff ? user.firmId : "" }, process.env.REFRESH_KEY, { expiresIn: process.env.REFRESH_EXP })
 
         res.status(200).send({
             error: false,

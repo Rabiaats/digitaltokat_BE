@@ -5,9 +5,9 @@ const router = require('express').Router()
 
 const {list, create, read, update, deletee} = require('../controllers/token');
 
-const {isSuperAdmin} = require('../middlewares/permissions');
+const {isAdmin} = require('../middlewares/permissions');
 
-router.use(isSuperAdmin)
+router.use(isAdmin)
 
 router.route('/')
     .get(list)

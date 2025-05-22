@@ -5,7 +5,7 @@ module.exports = {
     isLogin: (req, res, next) => {
 
         // Set Passive:
-        // return next()
+        return next()
 
         // any User:
         if (req.user) {
@@ -19,13 +19,13 @@ module.exports = {
         }
     },
 
-    isSuperAdmin: (req, res, next) => {
+    isAdmin: (req, res, next) => {
 
         // Set Passive:
-        // return next()
+        return next()
         
         // only Admin:
-        if (req.user && req.user.role == 'superadmin') {
+        if (req.user && req.user.isAdmin) {
 
             next()
 
@@ -36,16 +36,30 @@ module.exports = {
         }
     },
 
-    isFirmOrSuperAdmin: (req, res, next) => {
+    isStaffOrAdmin: (req, res, next) => {
 
-        // return next()
+        return next()
 
-
-        if(req.user && (req.user.role == 'firm' || req.user.role == 'superadmin')){
+        if(req.user && (req.user.isAdmin || req.user.isStaff)){
             next();
         }else{
             res.errorStatusCode = 403;
             throw new Error('Bu işlemi yapmak için izniniz bulunmamaktadır. Tokat Dijital ya da Fİrma Admin\'i olarak giriş yapmanız gerekmektedir.')
+        }
+    },
+
+     isStaff: (req, res, next) => {
+
+        return next()
+        
+        if (req.user?.isStaff) {
+
+            next()
+
+        } else {
+
+            res.errorStatusCode = 403
+            throw new Error('Bu işlemi yapmak için yetkili değilsiniz.')
         }
     },
 }

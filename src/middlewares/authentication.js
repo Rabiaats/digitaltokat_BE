@@ -27,10 +27,6 @@ module.exports = async (req, res, next) => {
                 }
             })
         }
-
-        if(req.user && req.user.role == 'firm'){
-            req.firm = req.user.firmId
-        }
     }
 
     next()

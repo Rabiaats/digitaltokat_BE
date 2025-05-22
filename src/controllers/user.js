@@ -8,6 +8,7 @@ const sendMail = require('../helpers/sendMail')
 const token = require('../models/token');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+const fs = require('node:fs');
 
 module.exports = {
 
@@ -35,7 +36,7 @@ module.exports = {
         })
     },
 
-    // CRUD:
+    // CRUD: -> adminin firm admin i ekleyebilecegi bir form olmali admin dashboard unda
     create: async (req, res) => {
         /*
         #swagger.tags = ['Users']
@@ -49,21 +50,31 @@ module.exports = {
             }
     */
 
+            req.body.image = "";
+
+        if(req.file){
+            req.body.image = req.file.path
+        };
+
         const data = await User.create(req.body);
 
-    
-        sendMail(
-            data.email,
-            'Wellcome to E Commerce',
-            `
-                <h1>Welcome</h1>
-                <h2>${data.username}</h2>
-            `
-            )
+        // kullanıcı olusturuldugunda direk sisteme giris yapabilsin diye
+        /* Auth Login */
+        // Simple Token:
+        const tokenresult = await token.create({
+            userId: result._id,
+            token: passwordEncrypt(result._id + Date.now())
+        })
 
-        res.status(201).send({
+        // JWT:
+        const accessToken = jwt.sign(data.toJSON(), process.env.ACCESS_KEY, { expiresIn: process.env.ACCESS_EXP })
+        const refreshToken = jwt.sign({ _id: data._id, password: data.password, firmId: data.firmId }, process.env.REFRESH_KEY, { expiresIn: process.env.REFRESH_EXP })
+
+        res.status(200).send({
             error: false,
-            data
+            token: tokenresult.token,
+            bearer: { accessToken, refreshToken },
+            result
         })
     },
 
@@ -99,6 +110,23 @@ module.exports = {
 
         if (!req.user.isAdmin) req.params.id = req.user._id;
 
+        req.body.image = "";
+        
+        if (req.file) {
+            req.body.image = req.file.path;
+        }
+        
+                    
+        const user = await User.findOne({_id: req.params.id});
+                    
+        if(user && user.image){
+            if (fs.existsSync(`${deleteImage.image}`)) {
+                fs.unlinkSync(`${deleteImage.image}`);
+            }
+        }else{
+            throw new CustomError("Güncellemek istediğiniz ürün firmanızda bulunmamaktadır")
+        }
+
         const data = await User.updateOne({ _id: req.params.id }, req.body, { runValidators: true });
 
 
@@ -117,7 +145,23 @@ module.exports = {
 
         if (!req.user.isAdmin) req.params.id = req.user._id;
 
+        if(req.user.isStaff){
+            res.status(403).send({
+                error: true,
+                message: 'Firma silinmeden firma admini silinemez'
+            })
+        }
+
+        const deleteImage = await User.findOne({ _id: req.params.id });
+                     
+        if (deleteImage && deleteImage.image) {
+            if (fs.existsSync(`${deleteImage.image}`)) {
+                fs.unlinkSync(`${deleteImage.image}`);
+            }
+        }
+
         const data = await User.deleteOne({ _id: req.params.id });
+
 
         res.status(data.deletedCount ? 204 : 404).send({
             error: true,

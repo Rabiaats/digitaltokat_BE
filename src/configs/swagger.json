@@ -165,8 +165,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "401": {
             "description": "Unauthorized"
@@ -249,6 +249,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -629,8 +632,8 @@
           "401": {
             "description": "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
+          "404": {
+            "description": "Not Found"
           }
         }
       }
@@ -656,6 +659,9 @@
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
           }
         }
       },
@@ -770,9 +776,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "images": {
-                  "example": "any"
-                },
                 "image": {
                   "example": "any"
                 }
@@ -873,9 +876,6 @@
           "401": {
             "description": "Unauthorized"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           }
@@ -919,6 +919,24 @@
           }
         }
       }
+    },
+    "/firms/request-removel/{id}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -935,9 +953,17 @@
               "type": "string",
               "example": "Firm"
             },
-            "required": {
-              "type": "boolean",
-              "example": true
+            "validate": {
+              "type": "object",
+              "properties": {
+                "validator": {
+                  "type": "function"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Satıcının ait olduğu firmanın bilgisi için firma id si girilmesi zorunludur. "
+                }
+              }
             }
           }
         },
@@ -981,25 +1007,79 @@
             }
           }
         },
-        "role": {
+        "firstName": {
           "type": "object",
           "properties": {
             "type": {
               "type": "function"
             },
-            "enum": {
-              "type": "array",
-              "example": [
-                "firm",
-                "superadmin"
-              ],
-              "items": {
-                "type": "string"
-              }
-            },
-            "required": {
+            "trim": {
               "type": "boolean",
               "example": true
+            },
+            "validate": {
+              "type": "object",
+              "properties": {
+                "validator": {
+                  "type": "function"
+                }
+              }
+            }
+          }
+        },
+        "lastName": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "function"
+            },
+            "trim": {
+              "type": "boolean",
+              "example": true
+            },
+            "validate": {
+              "type": "object",
+              "properties": {
+                "validator": {
+                  "type": "function"
+                }
+              }
+            }
+          }
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "function"
+            },
+            "trim": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        },
+        "isAdmin": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "function"
+            },
+            "default": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        },
+        "isStaff": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "function"
+            },
+            "default": {
+              "type": "boolean",
+              "example": false
             }
           }
         },
@@ -1030,25 +1110,6 @@
             }
           }
         },
-        "categoryId": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "type": {
-                "type": "function"
-              },
-              "ref": {
-                "type": "string",
-                "example": "Category"
-              },
-              "required": {
-                "type": "boolean",
-                "example": true
-              }
-            }
-          }
-        },
         "name": {
           "type": "object",
           "properties": {
@@ -1071,15 +1132,8 @@
             "type": {
               "type": "function"
             },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
+            "default": {},
             "trim": {
-              "type": "boolean",
-              "example": true
-            },
-            "unique": {
               "type": "boolean",
               "example": true
             },
@@ -1159,10 +1213,6 @@
             "type": {
               "type": "function"
             },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
             "trim": {
               "type": "boolean",
               "example": true
@@ -1205,19 +1255,30 @@
             }
           }
         },
-        "color": {
+        "comments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "function"
+              },
+              "ref": {
+                "type": "string",
+                "example": "Comment"
+              }
+            }
+          }
+        },
+        "rating": {
           "type": "object",
           "properties": {
             "type": {
               "type": "function"
             },
-            "required": {
-              "type": "boolean",
-              "example": true
-            },
-            "trim": {
-              "type": "boolean",
-              "example": true
+            "default": {
+              "type": "number",
+              "example": 0
             }
           }
         },
@@ -1239,18 +1300,6 @@
             },
             "get": {
               "type": "function"
-            }
-          }
-        },
-        "rating": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "function"
-            },
-            "default": {
-              "type": "number",
-              "example": 0
             }
           }
         },

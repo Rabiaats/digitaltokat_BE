@@ -49,7 +49,6 @@ const FirmSchema = new mongoose.Schema({
 
     whatsapp: {
         type: String,
-        required: true,
         trim: true
     },
 
@@ -63,7 +62,19 @@ const FirmSchema = new mongoose.Schema({
             message: "En az bir görsel yüklenmelidir.",
         },
     },
+
+    comments: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ],
     
+    rating: {
+        type: Number,
+        default: 0
+    },
+
     visitors: {
         type: []
     },
@@ -73,11 +84,6 @@ const FirmSchema = new mongoose.Schema({
         get: function (){
             return this.visitors.length;
         }
-    },
-
-    rating: {
-        type: Number,
-        default: 0
     },
 
     isActive: {
@@ -90,5 +96,21 @@ const FirmSchema = new mongoose.Schema({
     timestamps: true,
     toJSON: {getters: true}
 });
+
+FirmSchema.statics.commentRating = async function (firmId) {
+
+  const firm = await this.findById(firmId).populate('comments');
+
+  if (!firm || firm.comments.length === 0) {
+    firm.rating = 0;
+  } else {
+    const total = firm.comments.reduce((sum, comment) => sum + comment.rating, 0);
+    firm.rating = total / firm.comments.length;
+  }
+
+  await firm.save();
+  return firm;
+};
+
 
 module.exports = mongoose.model('Firm', FirmSchema)

@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const requestIP = require("request-ip");
 const encrypt = require("../helpers/passwordEncrypt");
 const { match } = require('node:assert');
+const Firm = require('../models/firm');
 
 module.exports = {
 
@@ -15,6 +16,7 @@ module.exports = {
             #swagger.tags = ["Products"]
             #swagger.summary = "List Products"
             #swagger.description = `
+                Ürün listeleme firma id si ya da firmanin web sayfasına ait domain e göre yapılır
                 You can send query with endpoint for search[], sort[], page and limit.
                 <ul> Examples:
                     <li>URL/?<b>filter[field1]=value1&filter[field2]=value1</b></li>
@@ -26,23 +28,28 @@ module.exports = {
         */
 
         let customFilter = {};
-        let domainFilter = ""
 
         // firm admin i sayfasi ise
-        if (req.user?.role == 'firm') customFilter = {firmId: req.firm};
+        if (req.user?.isStaff) customFilter = {firmId: req.user.firmId};
 
         const requestDomain = req.get('host');
 
         // isyeri domaini ise
-        if (requestDomain !== 'www.tokatdigital.com') {
-            domainFilter = requestDomain;
+        if (requestDomain != 'www.tokatdigital.com'  && !requestDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+            if(!firm){
+                res.status(404).send({
+                    error: true,
+                    message: 'Ürünlerini listelemek istediginiz firma sistemde bulunmamaktadır!'
+                })
+            }
+            customFilter = {firmId: firm?._id};
         }else{
-            domainFilter = `/details/${req.params.id}`
+            customFilter = {firmId: req.params.id}
         }
 
-
         const data = await res.getModelList(Product, customFilter, [
-            {path: 'firmId', select: 'name -_id', match: {domain: domainFilter}},
+            {path: 'firmId', select: 'name -_id'},
         ])
 
         res.status(200).send({
@@ -65,11 +72,21 @@ module.exports = {
             }
         */
 
-        if(req.user && req.user.role == 'firm' && req.body.firmId != req.firm){
-            res.status(403).send({
-                error: true,
-                message: 'Yanlış firmaya ürün eklemeye çalışıyorsunuz.'
-            })
+        // firm admin i sayfasi ise kendi firmId sini body den gelen firmId ye esitleriz
+        if (req.user?.isStaff) req.body.firmId = req.user.firmId;
+
+        const requestDomain = req.get('host');
+
+        // isyeri domaini ise
+        if (requestDomain != 'www.tokatdigital.com'  && !requestDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+            if(!firm){
+                res.status(404).send({
+                    error: true,
+                    message: 'Ürün eklemek istediginiz firma sistemde bulunmamaktadır!'
+                })
+            }
+            req.body.firmId = firm?._id;
         }
 
         req.body.image = "";
@@ -95,9 +112,23 @@ module.exports = {
         
             let customFilter = {};
 
-            if(req.user && req.user.role == 'firm'){
+            if(req.user?.isStaff){
                 customFilter = {firmId: req.user.firmId}
             }
+
+            const requestDomain = req.get('host');
+
+        // isyeri domaini ise
+        if (requestDomain != 'www.tokatdigital.com'  && requestDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+            if(!firm){
+                res.status(404).send({
+                    error: true,
+                    message: 'Görüntülemek istediğiniz ürün firmada bulunmamaktadır!'
+                })
+            }
+            customFilter = {firmId: firm?._id}
+        }
     
             const data = await Product.findOne(
                 { _id: req.params.id, ...customFilter },
@@ -132,7 +163,9 @@ module.exports = {
                 req.body.image = req.file.path;
             }
 
-            if(req.user && req.user.role == 'firm'){
+            let customFilter = "";
+
+            if(req.user?.isStaff){
                 customFilter = {firmId: req.user.firmId}
             }
             
@@ -162,14 +195,17 @@ module.exports = {
                 #swagger.summary = "Delete Product"
             */
 
-            if(req.user && req.user.role == 'firm'){
-                req.params.id = req.user.firmId
+            let customFilter = "";
+
+            if(req.user?.isStaff){
+                customFilter = {firmId: req.user.firmId}
             }
+            
     
-            const data = await Product.findOne({ _id: req.params.id})
+            const data = await Product.findOne({ _id: req.params.id, ...customFilter})
 
             if(!data){
-                throw new CustomError('This product could not be found')
+                throw new CustomError('Silmek istediğiniz ürün bulunamadı ya da başka bir firmanın ürününü silmeye çalışıyorsunuz. Firma ve ürün bilgilerini kontrol ediniz')
             }
 
             const deleteImage = await Product.findOne({ _id: req.params.id });
@@ -180,7 +216,7 @@ module.exports = {
                 }
             }
 
-            await Product.deleteOne({_id : req.params.id})
+            await Product.deleteOne({_id : req.params.id, ...customFilter})
     
             res.status(data.deletedCount ? 204 : 404).send({
                 error: true,

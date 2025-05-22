@@ -5,6 +5,7 @@ const User = require('../models/user')
 const requestIP = require("request-ip");
 const fs = require('node:fs');
 const encrypt = require("../helpers/passwordEncrypt");
+const passwordCreate = require('../helpers/passwordCreate');
 
 module.exports = {
 
@@ -23,13 +24,11 @@ module.exports = {
             `
         */
 
-        let customFilter = {isActive: true};
-
-        if (req.user?.role == 'firm') customFilter = {_id: req.firm};
+        if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
 
         const requestDomain = req.get('host');
 
-        if (requestDomain !== 'www.tokatdigital.com' && requestDomain !== '127.0.0.1:8000') {
+        if (requestDomain !== 'www.tokatdigital.com' && !requestDomain.includes('127.0.0.1')) {
             customFilter.domain = requestDomain;
         }
 
@@ -57,16 +56,20 @@ module.exports = {
                 }
             */
 
-                req.body.image = [];
+            req.body.image = [];
 
-        if(req.files){
-            for(let file of req.files){
-                req.body.image.push(file.path)
+            if(req.files){
+                for(let file of req.files){
+                    req.body.image.push(file.path)
                 }
             };
 
 
             const data = await Firm.create(req.body)
+
+            const password = passwordCreate(data.email);
+
+            const user = await User.create({firmId: data._id, email: data.email, password, isStaff: true});
     
             res.status(201).send({
                 error: false,
@@ -84,7 +87,7 @@ module.exports = {
             const ip = !req.user ? encrypt(requestIP.getClientIp(req)) : null;
 
 
-            let firmId = req.user?.role == 'firm' ? req.user.firmId : req.params.id
+            let firmId = req.user?.isStaff ? req.user.firmId : req.params.id
     
             let data;
 
@@ -125,16 +128,15 @@ module.exports = {
                 }
             */
 
-                if ((req.user?.role == 'firm') && req.params.id != req.user.firmId){
-
-                res.status(403).send({
+                if ((req.user?.isStaff) && req.params.id != req.user.firmId){
+                    res.status(403).send({
                     error: true,
                     message: 'Sadece kendinize ait firmayı güncelleme izniniz var.'
                 })
 
             }
 
-            let firmId = req.user?.role == 'firm' ? req.user.firmId : req.params.id
+            let firmId = req.user?.isStaff ? req.firm : req.params.id
 
             if (req.files) {
                 for (let file of req.files) {
@@ -169,15 +171,6 @@ module.exports = {
                 #swagger.tags = ["Firms"]
                 #swagger.summary = "Delete Firm"
             */
-           
-           if ((req.user.role == 'firm') && req.params.id != req.user.firmId){
-               
-               res.status(403).send({
-                   error: true,
-                   message: 'Sadece kendinize ait firmayı silme izniniz var.'
-                })
-                
-            }
 
             const deleteImage = await Firm.findOne({ _id: req.params.id });
  
@@ -190,12 +183,27 @@ module.exports = {
             }
     
             const data = await Firm.deleteOne({ _id: req.params.id})
-    
+
+            await User.deleteOne({firmId: req.params.id});
+            
             res.status(data.deletedCount ? 204 : 404).send({
                 error: true,
                 message: 'Silmek istediğiniz firma önceden silinmiş olabilir.'
-
             })
     
         },
+
+        requestAccountRemoval: async(req, res) => {
+            // Hesap silme isteği -> firma adminleri direk silemesin sadece superadmin
+
+            if (req.user?.isStaff) req.params.id = req.user.firmId;
+
+            const data = await Firm.updateOne({ _id: req.params.id},{isActive: false}, {runValidators: true})
+
+            res.status(202).send({
+                error: false,
+                message: 'Silme isteğiniz iletildi'
+            })
+        }
+
 }

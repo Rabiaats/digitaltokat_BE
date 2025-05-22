@@ -25,6 +25,9 @@ router.use('/products', require('./product'))
 // firm
 router.use('/firms', require('./firm'))
 
+// log
+router.use('logs', require('./log'));
+
 // document: API icin gorsel dokuman
 router.use('/documents', require('./document'))
 
