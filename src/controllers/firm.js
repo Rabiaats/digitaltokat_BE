@@ -24,12 +24,13 @@ module.exports = {
             `
         */
 
-        let customFilter = "";
+        let customFilter = {};
 
         if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
 
         const requestDomain = req.get('host');
 
+        console.log(requestDomain);
         if (requestDomain !== 'www.tokatdigital.com' && !requestDomain.includes('127.0.0.1')) {
             customFilter.domain = requestDomain;
         }
