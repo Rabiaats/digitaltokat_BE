@@ -32,11 +32,11 @@ module.exports = {
         // firm admin i sayfasi ise
         if (req.user?.isStaff) customFilter = {firmId: req.user.firmId};
 
-        const requestDomain = req.get('host');
+        const frontendDomain = req.headers["Frontend-Domain"]
 
         // isyeri domaini ise
-        if (requestDomain != 'www.tokatdigital.com'  && !requestDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+        if (frontendDomain != 'www.tokatdigital.com'  && !frontendDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
             if(!firm){
                 res.status(404).send({
                     error: true,
@@ -75,11 +75,11 @@ module.exports = {
         // firm admin i sayfasi ise kendi firmId sini body den gelen firmId ye esitleriz
         if (req.user?.isStaff) req.body.firmId = req.user.firmId;
 
-        const requestDomain = req.get('host');
+        const frontendDomain = req.headers["Frontend-Domain"]
 
         // isyeri domaini ise
-        if (requestDomain != 'www.tokatdigital.com'  && !requestDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+        if (frontendDomain != 'www.tokatdigital.com'  && !frontendDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
             if(!firm){
                 res.status(404).send({
                     error: true,
@@ -116,11 +116,11 @@ module.exports = {
                 customFilter = {firmId: req.user.firmId}
             }
 
-            const requestDomain = req.get('host');
+            const frontendDomain = req.headers["Frontend-Domain"]
 
         // isyeri domaini ise
-        if (requestDomain != 'www.tokatdigital.com'  && requestDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: requestDomain }).select('_id');
+        if (frontendDomain != 'www.tokatdigital.com'  && frontendDomain.includes('127.0.0.1')) {
+            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
             if(!firm){
                 res.status(404).send({
                     error: true,

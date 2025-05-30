@@ -28,12 +28,12 @@ module.exports = {
 
         if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
 
-        const requestDomain = req.get('host');
+        const frontendDomain = req.headers["Frontend-Domain"];
 
-        console.log("requestdomain = ", requestDomain);
+        console.log("frontendDomain = ", frontendDomain);
 
-        if (requestDomain !== 'www.tokatdigital.com' && !requestDomain.includes('digitaltokat-be.onrender.com')) {
-            customFilter.domain = requestDomain;
+        if (frontendDomain !== 'www.tokatdigital.com' && !frontendDomain.includes('127.0.0.1')) {
+            customFilter.domain = frontendDomain;
         }
 
         const data = await res.getModelList(Firm, customFilter, [
@@ -44,7 +44,7 @@ module.exports = {
             error: false,
             details: await res.getModelListDetails(Firm),
             data,
-            requestDomain
+            frontendDomain
         })
     },
 
