@@ -18,7 +18,7 @@ Tokat Digital, Tokat ilindeki işletmeleri ve ürünlerini kullanıcılarla bulu
 ---
 
 ## 📁 Proje Yapısı
-
+```
 📦 tokat-digital-backend
 ├── logs/
 ├── src/
@@ -74,7 +74,7 @@ Tokat Digital, Tokat ilindeki işletmeleri ve ürünlerini kullanıcılarla bulu
 ├── index.js
 ├── swaggerAutogen.json
 └── README.md
-
+``` 
 ---
 
 ## 👥 Roller
@@ -119,14 +119,14 @@ Tokat Digital, Tokat ilindeki işletmeleri ve ürünlerini kullanıcılarla bulu
 - MongoDB
 
 ### Başlatmak için
-
+``` 
 git clone https://github.com/kullaniciadi/tokat-digital-backend.git
 cd tokat-digital-backend
 npm install
 cp .env.example .env
 # .env dosyasını kendine göre düzenle
 npm start
-
+``` 
 ---
 
 ## 💡 Notlar
