@@ -22,53 +22,53 @@ Tokat Digital, Tokat ilindeki işletmeleri ve ürünlerini kullanıcılarla bulu
 📦 tokat-digital-backend
 ├── logs/
 ├── src/
-    ├── configs/
-        ├── dbConnection.js
-        └── swagger.json
-    ├── controllers/
-        ├── auth.js
-        ├── category.js
-        ├── comment.js
-        ├── firm.js
-        ├── log.js
-        ├── product.js
-        ├── token.js
-        ├── type.js
-        └── user.js
-    ├── errors/
-        └── customError.js
-    ├── helpers/
-        ├── passwordCreate.js
-        ├── passwordEncrypt.js
-        ├── sendMail.js
-        └── sync.js
-    ├── middlewares/
-        ├── authentication.js
-        ├── errorHandler.js
-        ├── logger.js
-        ├── permission.js
-        ├── queryHandler.js
-        └── upload.js
-    ├── models/
-        ├── category.js
-        ├── comment.js
-        ├── firm.js
-        ├── product.js
-        ├── token.js
-        ├── type.js
-        └── user.js
-    ├── routes/
-        ├── auth.js
-        ├── category.js
-        ├── comment.js
-        ├── document.js
-        ├── firm.js
-        ├── index.js
-        ├── log.js
-        ├── product.js
-        ├── token.js
-        ├── type.js
-        └── user.js
+│   ├── configs/
+│   │   ├── dbConnection.js
+│   │   └── swagger.json
+│   ├── controllers/
+│   │   ├── auth.js
+│   │   ├── category.js
+│   │   ├── comment.js
+│   │   ├── firm.js
+│   │   ├── log.js
+│   │   ├── product.js
+│   │   ├── token.js
+│   │   ├── type.js
+│   │   └── user.js
+│   ├── errors/
+│   │   └── customError.js
+│   ├── helpers/
+│   │   ├── passwordCreate.js
+│   │   ├── passwordEncrypt.js
+│   │   ├── sendMail.js
+│   │   └── sync.js
+│   ├── middlewares/
+│   │   ├── authentication.js
+│   │   ├── errorHandler.js
+│   │   ├── logger.js
+│   │   ├── permission.js
+│   │   ├── queryHandler.js
+│   │   └── upload.js
+│   ├── models/
+│   │   ├── category.js
+│   │   ├── comment.js
+│   │   ├── firm.js
+│   │   ├── product.js
+│   │   ├── token.js
+│   │   ├── type.js
+│   │   └── user.js
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── category.js
+│   │   ├── comment.js
+│   │   ├── document.js
+│   │   ├── firm.js
+│   │   ├── index.js
+│   │   ├── log.js
+│   │   ├── product.js
+│   │   ├── token.js
+│   │   ├── type.js
+│   │   └── user.js
 ├── uploads/
 ├── .env
 ├── index.js
