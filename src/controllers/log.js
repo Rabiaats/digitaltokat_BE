@@ -6,35 +6,42 @@ const path = require("path");
 module.exports = {
 
     list: (req, res) => {
-         const logDirectory = path.join(__dirname, "../../logs");
+      const logDirectory = path.join(__dirname, "../../logs");
 
-        fs.readdir(logDirectory, (err, files) => {
-            if (err) return res.status(500).json({ message: "Log dizini okunamadı" });
+      fs.readdir(logDirectory, (err, files) => {
+        if (err) return res.status(500).json({ message: "Log dizini okunamadı" });
 
-            const logFiles = files.filter((file) => file.endsWith(".log"));
-            const allLines = [];
-            let remaining = logFiles.length;
+        const logFiles = files.filter((file) => file.endsWith(".log"));
+        const allLines = [];
+        let remaining = logFiles.length;
 
-            if (remaining === 0) return res.json([]);
+        if (remaining === 0) return res.json([]);
 
-            logFiles.forEach((file) => {
-                const filePath = path.join(logDirectory, file);
+        logFiles.forEach((file) => {
+          const filePath = path.join(logDirectory, file);
 
-                fs.readFile(filePath, "utf8", (err, data) => {
-                    if (!err) {
-                        // satırları array'e ekle
-                        const lines = data.split("\n").filter(line => line.trim() !== "");
-                        allLines.push(...lines);
-                    }
+          fs.readFile(filePath, "utf8", (err, data) => {
+            if (!err) {
+              const lines = data.split("\n").filter(line => line.trim() !== "");
+              // lines artık string array, bunu obje array’e çevirebiliriz:
+              const parsedLines = lines.map(line => {
+                let type = "info";
+                if (line.startsWith("[ERROR]")) type = "error";
+                else if (line.startsWith("[WARNING]")) type = "warning";
 
-                    remaining--;
+                return { line, type };
+              });
+              allLines.push(...parsedLines);
+            }
 
-                    if (remaining === 0) {
-                        res.json(allLines);
-                    }
-                });
-            });
+            remaining--;
+
+            if (remaining === 0) {
+              res.json(allLines);
+            }
+          });
         });
+      });
     },
 
     deletee: (req, res) => {

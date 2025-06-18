@@ -28,7 +28,7 @@ module.exports = {
 
         if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
 
-        const frontendDomain = req.headers["Frontend-Domain"];
+        const frontendDomain = req.headers["frontend-domain"];
 
         console.log("frontendDomain = ", frontendDomain);
 

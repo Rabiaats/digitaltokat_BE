@@ -623,6 +623,11 @@
             "schema": {
               "$ref": "#/definitions/Product"
             }
+          },
+          {
+            "name": "Frontend-Domain",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -650,6 +655,11 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Frontend-Domain",
+            "in": "header",
             "type": "string"
           }
         ],
