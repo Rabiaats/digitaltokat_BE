@@ -69,6 +69,11 @@ const FirmSchema = new mongoose.Schema({
             ref: 'Comment'
         }
     ],
+
+    advantages:{
+            type: String,
+            default: ''
+    },
     
     rating: {
         type: Number,
@@ -87,6 +92,11 @@ const FirmSchema = new mongoose.Schema({
     },
 
     isActive: {
+        type: Boolean,
+        default: true
+    },
+
+    isOpen: {
         type: Boolean,
         default: true
     }
