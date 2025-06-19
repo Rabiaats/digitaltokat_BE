@@ -66,7 +66,7 @@ const UserSchema = new mongoose.Schema({
 
     age: {
         type: Number,
-        required
+        required: true
     },
 
     image: {

@@ -31,27 +31,38 @@ module.exports = {
         let customFilter = {};
 
         
-        const frontendDomain = req.headers["Frontend-Domain"]
-        
-        // isyeri domaini ise
-        if (frontendDomain != 'www.tokatdigital.com'  && !frontendDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
-            if(!firm){
-                res.status(404).send({
-                    error: true,
-                    message: 'Ürünlerini listelemek istediginiz firma sistemde bulunmamaktadır!'
-                })
-            }
-            customFilter = {firmId: firm?._id};
-        }
+        let frontendDomain = "";
         // firm admin i sayfasi ise
-        else if(req.user?.isStaff){
+        if(req.user?.isStaff){
             customFilter = {firmId: req.user.firmId};
         } 
         //params
-        else{
+        else if( req.params.id){
             customFilter = {firmId: req.params.id}
         }
+        // frontend-domain
+        else{
+            frontendDomain = req.headers["frontend-domain"];
+            console.log("frontendDomain = ", frontendDomain);
+
+            if (frontendDomain) {
+                const firm = await Firm.findOne({ domain: frontendDomain }).select("_id");
+                if (firm) {
+                    customFilter = {firmId: firm._id}
+                }else {
+                    res.status(404).send({
+                        error: true,
+                        message: "Görüntülemek istediğiniz ürünlerin firmasi bulunamadi. Frontend-Domain i doğru gönderdiğinizden emin olun."
+                    })
+                }
+            }else {
+                return res.status(400).send({
+                    error: true,
+                    message: "Frontend-Domain başlığı gönderilmedi. Lütfen isteği gönderirken headers ile windows.location.hostname i Frontend-Domain ile gönderiniz.",
+                });
+            }
+        }
+        
 
         if(!customFilter.firmId){
             res.status(404).send({
@@ -67,7 +78,8 @@ module.exports = {
         res.status(200).send({
             error: false,
             details: await res.getModelListDetails(Product),
-            data            
+            data,
+            frontendDomain
         })
     },
 
@@ -85,20 +97,15 @@ module.exports = {
         */
 
         // firm admin i sayfasi ise kendi firmId sini body den gelen firmId ye esitleriz
-        if (req.user?.isStaff) req.body.firmId = req.user.firmId;
-
+        if (req.user?.isStaff){
+            req.body.firmId = req.user.firmId
+        }
+        
         const frontendDomain = req.headers["Frontend-Domain"]
 
-        // isyeri domaini ise
-        if (frontendDomain != 'www.tokatdigital.com'  && !frontendDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
-            if(!firm){
-                res.status(404).send({
-                    error: true,
-                    message: 'Ürün eklemek istediginiz firma sistemde bulunmamaktadır!'
-                })
-            }
-            req.body.firmId = firm?._id;
+        const firm = await Firm.findOne({ domain: frontendDomain }).select("_id");
+        if (firm) {
+            req.body.firmId = firm._id
         }
 
         req.body.image = "";
@@ -111,7 +118,8 @@ module.exports = {
     
         res.status(201).send({
             error: false,
-            data
+            data,
+            frontendDomain
         })
     },
     
@@ -120,30 +128,9 @@ module.exports = {
                 #swagger.tags = ["Products"]
                 #swagger.summary = "Get Single Product"
             */
-
-        
-            let customFilter = {};
-
-            if(req.user?.isStaff){
-                customFilter = {firmId: req.user.firmId}
-            }
-
-            const frontendDomain = req.headers["Frontend-Domain"]
-
-        // isyeri domaini ise
-        if (frontendDomain != 'www.tokatdigital.com'  && frontendDomain.includes('127.0.0.1')) {
-            const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
-            if(!firm){
-                res.status(404).send({
-                    error: true,
-                    message: 'Görüntülemek istediğiniz ürün firmada bulunmamaktadır!'
-                })
-            }
-            customFilter = {firmId: firm?._id}
-        }
     
             const data = await Product.findOne(
-                { _id: req.params.id, ...customFilter },
+                { _id: req.params.id },
             ).populate([
                 {path: 'categoryId', select: 'name -_id'},
                 {path: 'firmId', select: 'name -_id'},

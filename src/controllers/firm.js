@@ -26,14 +26,29 @@ module.exports = {
 
         let customFilter = {};
 
-        if (req.user?.isStaff) customFilter = {_id: req.user.firmId};
+        let frontendDomain = "";
 
-        const frontendDomain = req.headers["frontend-domain"];
+        if (req.user?.isStaff) {
+            customFilter._id = req.user.firmId;
+        } else {
+            frontendDomain = req.headers["frontend-domain"];
+            console.log("frontendDomain = ", frontendDomain);
 
-        console.log("frontendDomain = ", frontendDomain);
-
-        if (frontendDomain !== 'www.tokatdigital.com' && !frontendDomain.includes('127.0.0.1')) {
-            customFilter.domain = frontendDomain;
+            // Domain varsa ve kullanıcı staff değilse, firmayı bul -> firmanin web sayfasi ise
+            if (frontendDomain) {
+                const firm = await Firm.findOne({ domain: frontendDomain }).select("_id");
+                if (firm) {
+                    res.status(200).send({
+                        error: false,
+                        firm
+                    })
+                } 
+            }else {
+                return res.status(400).send({
+                    error: true,
+                    message: "Frontend-Domain başlığı gönderilmedi. Lütfen isteği gönderirken headers ile windows.location.hostname i Frontend-Domain ile gönderiniz.",
+                });
+            }
         }
 
         const data = await res.getModelList(Firm, customFilter, [
@@ -93,7 +108,31 @@ module.exports = {
             const ip = req.user && !req.user.isStaff && !req.user.isAdmin ? encrypt(requestIP.getClientIp(req)) : null;
 
             let firmId = req.user?.isStaff ? req.user.firmId : req.params.id
+
+            let frontendDomain = "";
     
+            if(!firmId){
+                
+                frontendDomain = req.headers["frontend-domain"];
+                console.log("frontendDomain = ", frontendDomain);
+
+                // Domain varsa ve kullanıcı staff değilse, firmayı bul -> firmanin web sayfasi ise
+                if (frontendDomain) {
+                    const firm = await Firm.findOne({ domain: frontendDomain }).select("_id");
+                    if (firm) {
+                        res.status(200).send({
+                            error: false,
+                            firm
+                        })
+                    } 
+                }else {
+                    return res.status(400).send({
+                        error: true,
+                        message: "Frontend-Domain başlığı gönderilmedi. Lütfen isteği gönderirken headers ile windows.location.hostname i gönderiniz. Ya da params da firma id si gönderiniz.",
+                    });
+                }
+            }
+
             let data;
 
             if (ip) {
@@ -106,7 +145,7 @@ module.exports = {
                     { path: 'categoryId', select: 'name' }
                 ]);
             } else {
-                data = await Firm.findOne({ _id: req.params.id }).populate([
+                data = await Firm.findOne({ _id: firmId }).populate([
                     { path: 'typeId', select: 'name' },
                     { path: 'categoryId', select: 'name' }
                 ]);
@@ -115,7 +154,8 @@ module.exports = {
             res.status(200).send({
                 error: false,
                 data,
-                domain: data.domain
+                domain: data.domain,
+                frontendDomain
             })
     
         },
