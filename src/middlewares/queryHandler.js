@@ -21,7 +21,17 @@ module.exports = async(req, res, next) => {
     // search objesini regex'e çevir
     const searchTerms = [];
     for (let key in search) {
-        searchTerms.push({ [key]: { $regex: search[key], $options: "i" } });
+        const value = search[key];
+
+        if (Array.isArray(value)) {
+            // Örn: search[name]=saç&search[name]=tasarim
+            value.forEach(val => {
+                searchTerms.push({ [key]: { $regex: val, $options: "i" } });
+            });
+        } else {
+            // Tek değer varsa
+            searchTerms.push({ [key]: { $regex: value, $options: "i" } });
+        }
     }
 
     // pagination
