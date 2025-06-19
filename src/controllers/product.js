@@ -7,6 +7,7 @@ const requestIP = require("request-ip");
 const encrypt = require("../helpers/passwordEncrypt");
 const { match } = require('node:assert');
 const Firm = require('../models/firm');
+const { error } = require('node:console');
 
 module.exports = {
 
@@ -29,11 +30,9 @@ module.exports = {
 
         let customFilter = {};
 
-        // firm admin i sayfasi ise
-        if (req.user?.isStaff) customFilter = {firmId: req.user.firmId};
-
+        
         const frontendDomain = req.headers["Frontend-Domain"]
-
+        
         // isyeri domaini ise
         if (frontendDomain != 'www.tokatdigital.com'  && !frontendDomain.includes('127.0.0.1')) {
             const firm = await Firm.findOne({ domain: frontendDomain }).select('_id');
@@ -44,8 +43,21 @@ module.exports = {
                 })
             }
             customFilter = {firmId: firm?._id};
-        }else{
+        }
+        // firm admin i sayfasi ise
+        else if(req.user?.isStaff){
+            customFilter = {firmId: req.user.firmId};
+        } 
+        //params
+        else{
             customFilter = {firmId: req.params.id}
+        }
+
+        if(!customFilter.firmId){
+            res.status(404).send({
+                error: true,
+                message: 'Firma id sini göndermemiz gerekmektedir'
+            })
         }
 
         const data = await res.getModelList(Product, customFilter, [

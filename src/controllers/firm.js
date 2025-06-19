@@ -90,8 +90,7 @@ module.exports = {
             
                 */
 
-            const ip = !req.user ? encrypt(requestIP.getClientIp(req)) : null;
-
+            const ip = req.user && !req.user.isStaff && !req.user.isAdmin ? encrypt(requestIP.getClientIp(req)) : null;
 
             let firmId = req.user?.isStaff ? req.user.firmId : req.params.id
     
@@ -134,17 +133,10 @@ module.exports = {
                 }
             */
 
-                if ((req.user?.isStaff) && req.params.id != req.user.firmId){
-                    res.status(403).send({
-                    error: true,
-                    message: 'Sadece kendinize ait firmayı güncelleme izniniz var.'
-                })
-
-            }
-
-            let firmId = req.user?.isStaff ? req.firm : req.params.id
-
-            if (req.files) {
+           
+           let firmId = req.user?.isStaff ? req.user.firmId : req.params.id
+           
+           if (req.files) {
                 for (let file of req.files) {
                     req.body.image.push(file.path);
                 }
