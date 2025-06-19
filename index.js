@@ -68,7 +68,7 @@ app.all('*', (req, res) => {
 app.use(require('./src/middlewares/errorHandler'))
 
 // run server
-app.listen(PORT, () => console.log(`http://${PORT}`))
+app.listen(PORT, HOST, () => console.log(`http://${PORT}`))
 
 /* ------------------------------------------------------- */
 // Syncronization (must be in commentLine):

@@ -55,11 +55,6 @@ module.exports = {
                         message: "Görüntülemek istediğiniz ürünlerin firmasi bulunamadi. Frontend-Domain i doğru gönderdiğinizden emin olun."
                     })
                 }
-            }else {
-                return res.status(400).send({
-                    error: true,
-                    message: "Frontend-Domain başlığı gönderilmedi. Lütfen isteği gönderirken headers ile windows.location.hostname i Frontend-Domain ile gönderiniz.",
-                });
             }
         }
         
