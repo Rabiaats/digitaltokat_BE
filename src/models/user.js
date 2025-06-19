@@ -18,6 +18,16 @@ const UserSchema = new mongoose.Schema({
         }
     },
 
+    favoritesId: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Firm'
+            }
+        ],
+        default: []
+    },
+
     email: {
         type: String,
         trim: true,
@@ -54,6 +64,11 @@ const UserSchema = new mongoose.Schema({
         }
     },
 
+    age: {
+        type: Number,
+        required
+    },
+
     image: {
         type: String,
         trim: true,
@@ -65,6 +80,11 @@ const UserSchema = new mongoose.Schema({
     },
 
     isStaff:{
+        type: Boolean,
+        default: false
+    },
+
+    isBloked: {
         type: Boolean,
         default: false
     },
