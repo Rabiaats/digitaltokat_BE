@@ -84,6 +84,19 @@ const FirmSchema = new mongoose.Schema({
         type: []
     },
 
+    openingTime: {
+        type: String,
+    },
+    
+    closingTime: {
+        type: String, // Örn: "17:00"
+    },
+
+    isOpen: {
+        type: Boolean,
+        default: true
+    },
+
     countOfVisitors:{
         type: Number,
         get: function (){
@@ -92,11 +105,6 @@ const FirmSchema = new mongoose.Schema({
     },
 
     isActive: {
-        type: Boolean,
-        default: true
-    },
-
-    isOpen: {
         type: Boolean,
         default: true
     }
