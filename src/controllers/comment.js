@@ -53,7 +53,7 @@ module.exports = {
           if (!data) {
             return res.status(404).send({
               error: true,
-              message: "Comment not found",
+              message: "Yorum bulunamadı.",
             });
           }
 
@@ -76,12 +76,12 @@ module.exports = {
             }
         */
 
-        const data = await Comment.findOneAndUpdate({ _id: req.params.id, userId: req.user_id }, req.body, { runValidators: true })
+        const data = await Comment.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, req.body, { runValidators: true })
 
         if (!data) {
             return res.status(404).send({
               error: true,
-              message: "Comment not found",
+              message: "Yorum bulunamadı.",
             });
           }
 
@@ -105,7 +105,7 @@ module.exports = {
         if (!data) {
             return res.status(404).send({
               error: true,
-              message: "Comment not found",
+              message: "Yorum bulunamadı.",
             });
           };
 
@@ -117,7 +117,7 @@ module.exports = {
 
         res.status(data ? 204 : 404).send({
             error: true,
-            message: 'Something went wrong, data might be deleted already.'
+            message: 'Yorum daha öncedden silinmiş olabilir.'
         })
     },
 

@@ -11,7 +11,7 @@ const CommentSchema = new mongoose.Schema({
         required: true
     },
     
-    blogId: {
+    firmId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Firm',
         required: true
